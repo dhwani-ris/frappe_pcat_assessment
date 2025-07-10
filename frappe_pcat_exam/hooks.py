@@ -30,7 +30,6 @@ app_license = "mit"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/frappe_pcat_exam/css/frappe_pcat_exam.css"
-# web_include_js = "/assets/frappe_pcat_exam/js/frappe_pcat_exam.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "frappe_pcat_exam/public/scss/website"
@@ -43,7 +42,10 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "LMS Question": "public/js/pcat_question.js",
+    "LMS Quiz": "public/js/pcat_quiz.js"
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -132,13 +134,13 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"LMS Quiz Submission": {
+		"validate": "frappe_pcat_exam.frappe_pcat_exam.overrides.lms_quiz_submission.validate",
+		"before_save": "frappe_pcat_exam.frappe_pcat_exam.overrides.lms_quiz_submission.before_save",
+		"on_update": "frappe_pcat_exam.frappe_pcat_exam.overrides.lms_quiz_submission.on_update"
+	}
+}
 
 # Scheduled Tasks
 # ---------------
@@ -237,3 +239,11 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+fixtures = [
+    {
+        "doctype": "Property Setter",
+        "filters": {
+            "name": ["in", ["LMS Quiz Question-type-options", "LMS Question-type-options", "LMS Quiz-passing_percentage-mandatory"]] 
+        },
+    },
+]
