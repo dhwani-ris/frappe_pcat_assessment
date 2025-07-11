@@ -61,8 +61,8 @@ function applyQuestionFilter(frm) {
     
     frm.set_query('question', 'questions', function() {
         const filters = frm.doc.custom_pcat_quiz 
-            ? { 'type': 'PCAT' }
-            : { 'type': ['!=', 'PCAT'] };
+            ? { 'custom_is_pcat_question': 1 }
+            : { 'custom_is_pcat_question': 0 };
             
         return { filters };
     });
@@ -83,10 +83,10 @@ async function cleanIncompatibleQuestions(frm) {
     // Identify rows to remove
     const rowsToRemove = [];
     questionsToCheck.forEach((row, index) => {
-        const questionType = questionTypes[index];
+        const isPcatQuestion = questionTypes[index];
         const shouldRemove = frm.doc.custom_pcat_quiz 
-            ? questionType !== 'PCAT'
-            : questionType === 'PCAT';
+            ? !isPcatQuestion
+            : isPcatQuestion;
             
         if (shouldRemove) {
             rowsToRemove.push(row.idx - 1);
@@ -100,19 +100,19 @@ async function cleanIncompatibleQuestions(frm) {
 }
 
 /**
- * Batch get question types with caching
+ * Batch get question PCAT status with caching
  */
 async function batchGetQuestionTypes(questionIds) {
     const uncachedIds = questionIds.filter(id => !questionTypeCache.has(id));
     
-    // Fetch uncached question types in batch
+    // Fetch uncached question PCAT status in batch
     if (uncachedIds.length > 0) {
         try {
             const response = await frappe.call({
                 method: 'frappe.client.get_list',
                 args: {
                     doctype: 'LMS Question',
-                    fields: ['name', 'type'],
+                    fields: ['name', 'custom_is_pcat_question'],
                     filters: { 'name': ['in', uncachedIds] },
                     limit_page_length: uncachedIds.length
                 }
@@ -121,7 +121,7 @@ async function batchGetQuestionTypes(questionIds) {
             // Cache the results
             if (response.message) {
                 response.message.forEach(question => {
-                    questionTypeCache.set(question.name, question.type);
+                    questionTypeCache.set(question.name, question.custom_is_pcat_question);
                 });
             }
         } catch (error) {
@@ -129,7 +129,7 @@ async function batchGetQuestionTypes(questionIds) {
         }
     }
     
-    // Return types from cache
+    // Return PCAT status from cache
     return questionIds.map(id => questionTypeCache.get(id));
 }
 
@@ -141,16 +141,16 @@ const validateQuestionSelection = frappe.utils.debounce(async function(frm, cdt,
     if (!row?.question) return;
     
     const questionTypes = await batchGetQuestionTypes([row.question]);
-    const questionType = questionTypes[0];
+    const isPcatQuestion = questionTypes[0];
     
-    if (!questionType) {
+    if (isPcatQuestion === undefined) {
         removeRow(frm, cdn);
         return;
     }
     
     const shouldRemove = frm.doc.custom_pcat_quiz 
-        ? questionType !== 'PCAT'
-        : questionType === 'PCAT';
+        ? !isPcatQuestion
+        : isPcatQuestion;
         
     if (shouldRemove) {
         removeRow(frm, cdn);
@@ -219,7 +219,7 @@ frappe.ui.form.on('LMS Quiz', {
         // Validate before submission
         if (frm.doc.custom_pcat_quiz && frm.doc.questions) {
             const hasNonPcatQuestions = frm.doc.questions.some(row => 
-                row.question && questionTypeCache.get(row.question) !== 'PCAT'
+                row.question && !questionTypeCache.get(row.question)
             );
             
             if (hasNonPcatQuestions) {

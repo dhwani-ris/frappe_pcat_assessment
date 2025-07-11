@@ -1,16 +1,16 @@
 frappe.ui.form.on('LMS Question', {
     refresh: function(frm) {
-        // Trigger the type change handler on form refresh if type is already set to PCAT
-        if (frm.doc.type === 'PCAT') {
+        // Trigger the PCAT checkbox handler on form refresh if PCAT is already checked
+        if (frm.doc.custom_is_pcat_question) {
             prefill_pcat_options(frm);
         }
     },
     
-    type: function(frm) {
-        if (frm.doc.type === 'PCAT') {
+    custom_is_pcat_question: function(frm) {
+        if (frm.doc.custom_is_pcat_question) {
             prefill_pcat_options(frm);
         } else {
-            // Clear options if type is changed from PCAT to something else
+            // Clear options if PCAT checkbox is unchecked
             clear_options(frm);
         }
     }
@@ -65,7 +65,7 @@ function prefill_pcat_options(frm) {
 
 
 function clear_options(frm) {
-    // Clear all option fields when type is changed from PCAT
+    // Clear all option fields when PCAT checkbox is unchecked
     for (let i = 1; i <= 4; i++) {
         frm.set_value(`option_${i}`, '');
         frm.set_value(`is_correct_${i}`, 0);

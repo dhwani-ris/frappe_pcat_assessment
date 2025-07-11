@@ -134,13 +134,7 @@ doctype_js = {
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
-	"LMS Quiz Submission": {
-		"validate": "frappe_pcat_exam.frappe_pcat_exam.overrides.lms_quiz_submission.validate",
-		"before_save": "frappe_pcat_exam.frappe_pcat_exam.overrides.lms_quiz_submission.before_save",
-		"on_update": "frappe_pcat_exam.frappe_pcat_exam.overrides.lms_quiz_submission.on_update"
-	}
-}
+
 
 # Scheduled Tasks
 # ---------------
@@ -171,9 +165,9 @@ doc_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "frappe_pcat_exam.event.get_events"
-# }
+override_whitelisted_methods = {
+	"lms.lms.doctype.lms_quiz.lms_quiz.quiz_summary": "frappe_pcat_exam.api.quiz_summary"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -243,7 +237,7 @@ fixtures = [
     {
         "doctype": "Property Setter",
         "filters": {
-            "name": ["in", ["LMS Quiz Question-type-options", "LMS Question-type-options", "LMS Quiz-passing_percentage-mandatory"]] 
+            "name": ["in", ["LMS Quiz-passing_percentage-mandatory"]] 
         },
     },
 ]
