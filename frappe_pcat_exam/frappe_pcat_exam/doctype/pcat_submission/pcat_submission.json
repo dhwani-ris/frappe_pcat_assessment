@@ -9,7 +9,6 @@
   "submission_date",
   "dominant_riasec_category",
   "total_score",
-  "top_count",
   "top_doctop_count_categories",
   "pcat_answers"
  ],
@@ -44,22 +43,16 @@
    "options": "PCAT Submission Answer"
   },
   {
-   "fieldname": "top_count",
-   "fieldtype": "Select",
-   "label": "Top Count",
-   "options": "1\n2\n3\n4\n5\n6\n7\n8"
-  },
-  {
    "fieldname": "top_doctop_count_categories",
    "fieldtype": "Table",
-   "label": "Top {doc.top_count} Categories",
+   "label": "Result",
    "options": "PCAT Top Categories"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-11 18:28:24.141602",
+ "modified": "2025-07-11 22:48:56.763741",
  "modified_by": "Administrator",
  "module": "Frappe PCAT Exam",
  "name": "PCAT Submission",

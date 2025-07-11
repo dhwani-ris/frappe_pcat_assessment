@@ -120,12 +120,17 @@ def pcat_quiz_summary(quiz, results):
     submission.total_score = sum(category_scores.values())
     submission.submission_date = frappe.utils.now()
 
-    # sort by score
+    # Sort categories by score (highest first)
     top_categories = sorted(category_scores.items(), key=lambda x: x[1], reverse=True)
 
-    # get top_count from submission field default, fallback to 3 if empty
-    top_count = int(submission.top_count) or 3
-
+    # Always add exactly top 3 categories to the child table
+    top_count = 3
+    
+    # Ensure we have at least 3 categories (fill with empty if needed)
+    while len(top_categories) < top_count:
+        top_categories.append(("No Category", 0))
+    
+    # Add exactly 3 rows to the child table
     for idx, (category, score) in enumerate(top_categories[:top_count], start=1):
         submission.append("top_doctop_count_categories", {
             "riasec_category": category,
