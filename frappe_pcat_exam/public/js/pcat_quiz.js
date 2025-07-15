@@ -125,6 +125,11 @@ async function batchGetQuestionTypes(questionIds) {
                 });
             }
         } catch (error) {
+            console.error('Error fetching question types:', error);
+            frappe.show_alert({
+                message: __('Error loading question data. Please refresh and try again.'),
+                indicator: 'red'
+            });
             throw error;
         }
     }

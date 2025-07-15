@@ -48,14 +48,15 @@ function prefill_pcat_options(frm) {
                 frm.refresh_fields();
             } else {
                 frappe.show_alert({
-                    message: __('No RIASEC Answer Options found in database'),
+                    message: __('No RIASEC Answer Options found in database. Please create some options first.'),
                     indicator: 'orange'
                 });
             }
         },
-        error: function() {
+        error: function(err) {
+            console.error('Error fetching RIASEC Answer Options:', err);
             frappe.show_alert({
-                message: __('Error fetching RIASEC Answer Options'),
+                message: __('Error fetching RIASEC Answer Options. Please check your connection and try again.'),
                 indicator: 'red'
             });
         }
