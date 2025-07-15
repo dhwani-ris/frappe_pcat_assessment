@@ -7,6 +7,7 @@
  "field_order": [
   "user",
   "submission_date",
+  "quiz",
   "dominant_riasec_category",
   "total_score",
   "top_doctop_count_categories",
@@ -47,12 +48,19 @@
    "fieldtype": "Table",
    "label": "Result",
    "options": "PCAT Top Categories"
+  },
+  {
+   "fieldname": "quiz",
+   "fieldtype": "Link",
+   "label": "Quiz",
+   "options": "LMS Quiz",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-11 22:48:56.763741",
+ "modified": "2025-07-15 12:56:11.295446",
  "modified_by": "Administrator",
  "module": "Frappe PCAT Exam",
  "name": "PCAT Submission",
