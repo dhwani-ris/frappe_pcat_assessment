@@ -105,6 +105,7 @@ def pcat_quiz_summary(quiz, results):
 
         submission = frappe.new_doc("PCAT Submission")
         submission.user = frappe.session.user
+        submission.quiz = quiz
         submission.dominant_riasec_category = dominant_category or "Not Determined"
         submission.total_score = sum(category_scores.values())
         submission.submission_date = frappe.utils.now()
