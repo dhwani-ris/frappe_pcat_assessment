@@ -8,7 +8,7 @@ app_license = "mit"
 # Apps
 # ------------------
 
-# required_apps = []
+required_apps = ["lms"]
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -122,13 +122,13 @@ doctype_js = {
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+permission_query_conditions = {
+    "PCAT Submission": "frappe_pcat_exam.frappe_pcat_exam.doctype.pcat_submission.pcat_submission.get_permission_query_conditions",
+}
+
+has_permission = {
+    "PCAT Submission": "frappe_pcat_exam.frappe_pcat_exam.doctype.pcat_submission.pcat_submission.has_permission",
+}
 
 # Document Events
 # ---------------
