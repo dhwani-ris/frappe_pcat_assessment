@@ -32,13 +32,14 @@ def quiz_summary(quiz, results):
         if not quiz_details:
             frappe.throw(_("Quiz not found"))
         
-        if quiz_details.custom_pcat_quiz:
-            logger.info(f"Processing PCAT quiz: {quiz}")
-            pcat_quiz_summary(quiz, results)
-        
         # Otherwise, run the original LMS submission flow
         logger.info(f"Processing standard LMS quiz: {quiz}")
         original_result = lms_quiz_summary_original(quiz, results)
+        
+        if quiz_details.custom_pcat_quiz:
+            logger.info(f"Processing PCAT quiz: {quiz}")
+            pcat_quiz_summary(quiz, results)
+
         
         # If this is a PCAT quiz, mark the LMS submission as PCAT
         if quiz_details.custom_pcat_quiz and original_result.get("submission"):
@@ -53,6 +54,7 @@ def quiz_summary(quiz, results):
                 logger.info(f"Marked LMS submission {original_result['submission']} as PCAT submission")
             except Exception as e:
                 logger.error(f"Error marking submission as PCAT: {str(e)}")
+            
         
         return original_result
         
