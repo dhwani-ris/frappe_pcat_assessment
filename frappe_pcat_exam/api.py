@@ -32,14 +32,29 @@ def quiz_summary(quiz, results):
         if not quiz_details:
             frappe.throw(_("Quiz not found"))
         
-        # If this is a PCAT quiz, run your own logic
         if quiz_details.custom_pcat_quiz:
             logger.info(f"Processing PCAT quiz: {quiz}")
-            return pcat_quiz_summary(quiz, results)
+            pcat_quiz_summary(quiz, results)
         
         # Otherwise, run the original LMS submission flow
         logger.info(f"Processing standard LMS quiz: {quiz}")
-        return lms_quiz_summary_original(quiz, results)
+        original_result = lms_quiz_summary_original(quiz, results)
+        
+        # If this is a PCAT quiz, mark the LMS submission as PCAT
+        if quiz_details.custom_pcat_quiz and original_result.get("submission"):
+            try:
+                # Use db.set_value to avoid triggering validation again
+                frappe.db.set_value(
+                    "LMS Quiz Submission", 
+                    original_result["submission"], 
+                    "custom_is_pcat_submission", 
+                    1
+                )
+                logger.info(f"Marked LMS submission {original_result['submission']} as PCAT submission")
+            except Exception as e:
+                logger.error(f"Error marking submission as PCAT: {str(e)}")
+        
+        return original_result
         
     except Exception as e:
         logger.error(f"Error in quiz_summary for quiz {quiz}: {str(e)}")
