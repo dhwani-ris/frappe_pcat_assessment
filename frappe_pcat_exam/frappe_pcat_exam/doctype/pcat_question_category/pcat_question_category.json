@@ -47,7 +47,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-10 18:29:28.863298",
+ "modified": "2025-07-17 12:17:04.350028",
  "modified_by": "Administrator",
  "module": "Frappe PCAT Exam",
  "name": "PCAT Question Category",
@@ -68,7 +68,9 @@
   }
  ],
  "row_format": "Dynamic",
+ "show_title_field_in_link": 1,
  "sort_field": "category_order",
  "sort_order": "ASC",
- "states": []
+ "states": [],
+ "title_field": "description"
 }
