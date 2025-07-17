@@ -163,7 +163,7 @@ def pcat_quiz_summary(quiz, results):
             })
 
         # Insert the submission after all answers are appended
-        submission.insert()
+        submission.insert(ignore_permissions=True)
         frappe.db.commit()
         
         logger.info(f"PCAT submission created successfully for user {frappe.session.user}")
