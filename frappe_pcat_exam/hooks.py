@@ -88,7 +88,7 @@ doctype_js = {
 # ------------
 
 # before_install = "frappe_pcat_exam.install.before_install"
-# after_install = "frappe_pcat_exam.install.after_install"
+after_install = "frappe_pcat_exam.install.after_install"
 
 # Uninstallation
 # ------------

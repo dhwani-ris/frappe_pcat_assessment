@@ -1,38 +1,6 @@
 [
  {
   "default_value": null,
-  "doc_type": "LMS Question",
-  "docstatus": 0,
-  "doctype": "Property Setter",
-  "doctype_or_field": "DocField",
-  "field_name": "type",
-  "is_system_generated": 0,
-  "modified": "2025-07-10 15:25:40.035114",
-  "module": "Frappe PCAT Exam",
-  "name": "LMS Question-type-options",
-  "property": "options",
-  "property_type": "text",
-  "row_name": null,
-  "value": "Choices\nUser Input\nOpen Ended\nPCAT"
- },
- {
-  "default_value": null,
-  "doc_type": "LMS Quiz Question",
-  "docstatus": 0,
-  "doctype": "Property Setter",
-  "doctype_or_field": "DocField",
-  "field_name": "type",
-  "is_system_generated": 0,
-  "modified": "2025-07-10 17:30:34.883497",
-  "module": "Frappe PCAT Exam",
-  "name": "LMS Quiz Question-type-options",
-  "property": "options",
-  "property_type": "text",
-  "row_name": null,
-  "value": "Choices\nUser Input\nOpen Ended\nPCAT"
- },
- {
-  "default_value": null,
   "doc_type": "LMS Quiz",
   "docstatus": 0,
   "doctype": "Property Setter",
