@@ -8,7 +8,7 @@ app_license = "mit"
 # Apps
 # ------------------
 
-# required_apps = []
+required_apps = ["lms"]
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -30,7 +30,6 @@ app_license = "mit"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/frappe_pcat_exam/css/frappe_pcat_exam.css"
-# web_include_js = "/assets/frappe_pcat_exam/js/frappe_pcat_exam.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "frappe_pcat_exam/public/scss/website"
@@ -43,7 +42,10 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "LMS Question": "public/js/pcat_question.js",
+    "LMS Quiz": "public/js/pcat_quiz.js"
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -86,7 +88,7 @@ app_license = "mit"
 # ------------
 
 # before_install = "frappe_pcat_exam.install.before_install"
-# after_install = "frappe_pcat_exam.install.after_install"
+after_install = "frappe_pcat_exam.install.after_install"
 
 # Uninstallation
 # ------------
@@ -120,25 +122,19 @@ app_license = "mit"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+permission_query_conditions = {
+    "PCAT Submission": "frappe_pcat_exam.frappe_pcat_exam.doctype.pcat_submission.pcat_submission.get_permission_query_conditions",
+}
+
+has_permission = {
+    "PCAT Submission": "frappe_pcat_exam.frappe_pcat_exam.doctype.pcat_submission.pcat_submission.has_permission",
+}
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+
 
 # Scheduled Tasks
 # ---------------
@@ -169,9 +165,9 @@ app_license = "mit"
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "frappe_pcat_exam.event.get_events"
-# }
+override_whitelisted_methods = {
+	"lms.lms.doctype.lms_quiz.lms_quiz.quiz_summary": "frappe_pcat_exam.api.quiz_summary"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -237,3 +233,11 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+fixtures = [
+    {
+        "doctype": "Property Setter",
+        "filters": {
+            "name": ["in", ["LMS Quiz-passing_percentage-mandatory"]] 
+        },
+    },
+]

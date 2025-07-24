@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-07-11 16:45:02.598943",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "submission_date",
+  "quiz",
+  "dominant_riasec_category",
+  "total_score",
+  "top_doctop_count_categories",
+  "pcat_answers"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User"
+  },
+  {
+   "fieldname": "submission_date",
+   "fieldtype": "Datetime",
+   "label": "Submission Date"
+  },
+  {
+   "fieldname": "dominant_riasec_category",
+   "fieldtype": "Link",
+   "label": "Dominant RIASEC Category",
+   "options": "PCAT Question Category"
+  },
+  {
+   "fieldname": "total_score",
+   "fieldtype": "Float",
+   "label": "Total Score",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pcat_answers",
+   "fieldtype": "Table",
+   "label": "Answers",
+   "options": "PCAT Submission Answer"
+  },
+  {
+   "fieldname": "top_doctop_count_categories",
+   "fieldtype": "Table",
+   "label": "Result",
+   "options": "PCAT Top Categories"
+  },
+  {
+   "fieldname": "quiz",
+   "fieldtype": "Link",
+   "label": "Quiz",
+   "options": "LMS Quiz",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-15 12:56:11.295446",
+ "modified_by": "Administrator",
+ "module": "Frappe PCAT Exam",
+ "name": "PCAT Submission",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
