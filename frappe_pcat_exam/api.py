@@ -127,8 +127,17 @@ def pcat_quiz_summary(quiz, results):
         submission.total_score = sum(category_scores.values())
         submission.submission_date = frappe.utils.now()
 
-        # Sort categories by score (highest first)
-        top_categories = sorted(category_scores.items(), key=lambda x: x[1], reverse=True)
+        # Get category orders for tiebreaking
+        category_orders = {}
+        for category in category_scores.keys():
+            order = frappe.db.get_value("PCAT Question Category", category, "category_order") or 999
+            category_orders[category] = order
+
+        # Sort by score first (highest), then by category_order (lowest = highest priority)
+        top_categories = sorted(
+            category_scores.items(), 
+            key=lambda x: (-x[1], category_orders[x[0]])
+        )
 
         # Always add exactly top 3 categories to the child table
         top_count = 3
