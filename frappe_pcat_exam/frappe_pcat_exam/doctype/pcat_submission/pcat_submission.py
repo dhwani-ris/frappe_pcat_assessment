@@ -31,26 +31,37 @@ class PCATSubmission(Document):
 			frappe.msgprint("Warning: Could not delete corresponding LMS Quiz Submission.", indicator="orange")
 
 def get_permission_query_conditions(user):
-    """Return permission query conditions for PCAT Submission"""
-    if not user:
-        user = frappe.session.user
-    
-    if "System Manager" in frappe.get_roles(user):
-        return ""
-    
-    # Users can only see their own submissions
-    return f"`tabPCAT Submission`.user = '{user}'"
+	"""Return permission query conditions for PCAT Submission"""
+
+	hooks = frappe.get_hooks("pcat_submission_permission_query_conditions")
+	if hooks:
+		# hooks[0] will still be the string path
+		return frappe.get_attr(hooks[0])(user)
+	
+	if not user:
+		user = frappe.session.user
+	
+	if "System Manager" in frappe.get_roles(user):
+		return ""
+	
+	# Users can only see their own submissions
+	return f"`tabPCAT Submission`.user = '{user}'"
 
 def has_permission(doc, ptype, user):
-    """Check if user has permission for PCAT Submission"""
-    if not user:
-        user = frappe.session.user
-    
-    if "System Manager" in frappe.get_roles(user):
-        return True
-    
-    # Users can only access their own submissions
-    if doc.user == user:
-        return True
-    
-    return False
+	"""Check if user has permission for PCAT Submission"""
+
+	hooks = frappe.get_hooks("pcat_submission_has_permission")
+	if hooks:
+		return frappe.get_attr(hooks[0])(doc, ptype, user)
+
+	if not user:
+		user = frappe.session.user
+	
+	if "System Manager" in frappe.get_roles(user):
+		return True
+	
+	# Users can only access their own submissions
+	if doc.user == user:
+		return True
+	
+	return False
