@@ -61,121 +61,141 @@ def quiz_summary(quiz, results):
 
 
 def pcat_quiz_summary(quiz, results):
-	"""
-	Process PCAT quiz submission and calculate RIASEC category scores.
-
-	Args:
-	    quiz (str): Quiz name
-	    results (str): JSON string of quiz results
-
-	Returns:
-	    dict: PCAT quiz summary with top categories
-	"""
+	"""Process PCAT quiz submission and calculate RIASEC category scores."""
 	try:
-		results = json.loads(results)
-		category_scores = {}
+		parsed_results = _validate_and_parse_results(results)
+		category_scores = _calculate_category_scores(parsed_results)
+		dominant_category = max(category_scores, key=category_scores.get) if category_scores else None
+		top_categories = _get_sorted_top_categories(category_scores)
 
-		# Validate results
-		if not results or not isinstance(results, list):
-			frappe.throw(_("Invalid quiz results format"))
+		submission = _create_submission_doc(quiz, category_scores, dominant_category)
+		_add_top_categories_to_submission(submission, top_categories)
+		_add_individual_answers(submission, parsed_results)
 
-		for result in results:
-			question = result.get("question_name")
-			selected_option = result.get("answer")
-
-			# Validate question exists and is a PCAT question
-			if not question:
-				continue
-
-			question_doc = frappe.db.get_value(
-				"LMS Question",
-				question,
-				["custom_is_pcat_question", "custom_pcat_question_category"],
-				as_dict=1,
-			)
-
-			if not question_doc or not question_doc.custom_is_pcat_question:
-				logger.warning(f"Question {question} is not a PCAT question, skipping")
-				continue
-
-			category = question_doc.custom_pcat_question_category
-			if not category:
-				logger.warning(f"Question {question} has no PCAT category assigned")
-				continue
-
-			# Get option value with validation
-			option_value = (
-				frappe.db.get_value("RIASEC Answer Options", {"option": selected_option}, "value") or 0
-			)
-
-			category_scores[category] = category_scores.get(category, 0) + option_value
-
-		dominant_category = None
-		if category_scores:
-			dominant_category = max(category_scores, key=category_scores.get)
-
-		submission = frappe.new_doc("PCAT Submission")
-		submission.user = frappe.session.user
-		submission.quiz = quiz
-		submission.dominant_riasec_category = dominant_category or "Not Determined"
-		submission.total_score = sum(category_scores.values())
-		submission.submission_date = frappe.utils.now()
-
-		# Get category orders for tiebreaking
-		category_orders = {}
-		for category in category_scores.keys():
-			order = frappe.db.get_value("PCAT Question Category", category, "category_order") or 999
-			category_orders[category] = order
-
-		# Sort by score first (highest), then by category_order (lowest = highest priority)
-		top_categories = sorted(category_scores.items(), key=lambda x: (-x[1], category_orders[x[0]]))
-
-		# Always add exactly top 3 categories to the child table
-		top_count = 3
-
-		# Ensure we have at least 3 categories (fill with empty if needed)
-		while len(top_categories) < top_count:
-			top_categories.append(("No Category", 0))
-
-		# Add exactly 3 rows to the child table
-		for _idx, (category, score) in enumerate(top_categories[:top_count], start=1):
-			submission.append("top_doctop_count_categories", {"riasec_category": category, "score": score})
-
-		# add individual answers
-		for result in results:
-			question = result.get("question_name")
-			selected_option = result.get("answer")
-			category = frappe.db.get_value("LMS Question", question, "custom_pcat_question_category")
-			option_value = (
-				frappe.db.get_value("RIASEC Answer Options", {"option": selected_option}, "value") or 0
-			)
-
-			submission.append(
-				"pcat_answers",
-				{
-					"question": question,
-					"selected_option": selected_option,
-					"riasec_category": category,
-					"score": option_value,
-				},
-			)
-
-		# Insert the submission after all answers are appended
 		submission.insert(ignore_permissions=True)
 		frappe.db.commit()
-
 		logger.info(f"PCAT submission created successfully for user {frappe.session.user}")
 
-		return {
-			"dominant_category": dominant_category or "Not Determined",
-			"top_categories": top_categories[:top_count],
-			"total_score": submission.total_score,
-			"category_scores": category_scores,
-			"is_pcat_quiz": True,
-			"quiz": quiz,
-		}
+		return _build_response(dominant_category, top_categories, submission, category_scores, quiz)
 
 	except Exception as e:
 		logger.error(f"Error in pcat_quiz_summary for quiz {quiz}: {e!s}")
 		frappe.db.rollback()
 		frappe.throw(_("Error processing PCAT quiz submission. Please try again."))
+
+
+def _validate_and_parse_results(results):
+	"""Parse and validate quiz results JSON."""
+	parsed = json.loads(results)
+	if not parsed or not isinstance(parsed, list):
+		frappe.throw(_("Invalid quiz results format"))
+	return parsed
+
+
+def _calculate_category_scores(results):
+	"""Calculate RIASEC category scores from quiz results."""
+	category_scores = {}
+
+	for result in results:
+		question = result.get("question_name")
+		selected_option = result.get("answer")
+
+		if not question:
+			continue
+
+		category = _get_question_category(question)
+		if not category:
+			continue
+
+		option_value = _get_option_value(selected_option)
+		category_scores[category] = category_scores.get(category, 0) + option_value
+
+	return category_scores
+
+
+def _get_question_category(question):
+	"""Get PCAT category for a question with validation."""
+	question_doc = frappe.db.get_value(
+		"LMS Question", question, ["custom_is_pcat_question", "custom_pcat_question_category"], as_dict=1
+	)
+
+	if not question_doc or not question_doc.custom_is_pcat_question:
+		logger.warning(f"Question {question} is not a PCAT question, skipping")
+		return None
+
+	if not question_doc.custom_pcat_question_category:
+		logger.warning(f"Question {question} has no PCAT category assigned")
+		return None
+
+	return question_doc.custom_pcat_question_category
+
+
+def _get_option_value(selected_option):
+	"""Get score value for selected answer option."""
+	return frappe.db.get_value("RIASEC Answer Options", {"option": selected_option}, "value") or 0
+
+
+def _get_sorted_top_categories(category_scores):
+	"""Sort categories by score and order, returning top 3."""
+	if not category_scores:
+		return [("No Category", 0)] * 3
+
+	category_orders = {
+		cat: frappe.db.get_value("PCAT Question Category", cat, "category_order") or 999
+		for cat in category_scores.keys()
+	}
+
+	top_categories = sorted(category_scores.items(), key=lambda x: (-x[1], category_orders[x[0]]))
+
+	while len(top_categories) < 3:
+		top_categories.append(("No Category", 0))
+
+	return top_categories
+
+
+def _create_submission_doc(quiz, category_scores, dominant_category):
+	"""Create PCAT submission document with basic fields."""
+	submission = frappe.new_doc("PCAT Submission")
+	submission.user = frappe.session.user
+	submission.quiz = quiz
+	submission.dominant_riasec_category = dominant_category or "Not Determined"
+	submission.total_score = sum(category_scores.values())
+	submission.submission_date = frappe.utils.now()
+	return submission
+
+
+def _add_top_categories_to_submission(submission, top_categories):
+	"""Add top 3 categories to submission child table."""
+	for _idx, (category, score) in enumerate(top_categories[:3], start=1):
+		submission.append("top_doctop_count_categories", {"riasec_category": category, "score": score})
+
+
+def _add_individual_answers(submission, results):
+	"""Add individual answer details to submission."""
+	for result in results:
+		question = result.get("question_name")
+		selected_option = result.get("answer")
+		category = frappe.db.get_value("LMS Question", question, "custom_pcat_question_category")
+		option_value = frappe.db.get_value("RIASEC Answer Options", {"option": selected_option}, "value") or 0
+
+		submission.append(
+			"pcat_answers",
+			{
+				"question": question,
+				"selected_option": selected_option,
+				"riasec_category": category,
+				"score": option_value,
+			},
+		)
+
+
+def _build_response(dominant_category, top_categories, submission, category_scores, quiz):
+	"""Build the response dictionary for PCAT quiz summary."""
+	return {
+		"dominant_category": dominant_category or "Not Determined",
+		"top_categories": top_categories[:3],
+		"total_score": submission.total_score,
+		"category_scores": category_scores,
+		"is_pcat_quiz": True,
+		"quiz": quiz,
+	}
