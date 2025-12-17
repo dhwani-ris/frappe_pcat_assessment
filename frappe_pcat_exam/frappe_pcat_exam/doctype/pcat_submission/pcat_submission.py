@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-
+from frappe import _
 
 class PCATSubmission(Document):
 	def on_trash(self):
@@ -25,7 +25,7 @@ class PCATSubmission(Document):
 		except Exception as e:
 			frappe.log_error(f"Error deleting LMS Quiz Submission for PCAT Submission {self.name}: {e!s}")
 			frappe.msgprint(
-				"Warning: Could not delete corresponding LMS Quiz Submission.", indicator="orange"
+				_("Warning: Could not delete corresponding LMS Quiz Submission."), indicator="orange"
 			)
 
 
