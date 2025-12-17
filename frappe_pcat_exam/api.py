@@ -72,9 +72,7 @@ def pcat_quiz_summary(quiz, results):
 	    dict: PCAT quiz summary with top categories
 	"""
 	try:
-		import json as pyjson
-
-		results = pyjson.loads(results)
+		results = json.loads(results)
 		category_scores = {}
 
 		# Validate results
