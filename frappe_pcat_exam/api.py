@@ -190,3 +190,4 @@ def pcat_quiz_summary(quiz, results):
         logger.error(f"Error in pcat_quiz_summary for quiz {quiz}: {str(e)}")
         frappe.db.rollback()
         frappe.throw(_("Error processing PCAT quiz submission. Please try again."))
+		
