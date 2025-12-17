@@ -10,7 +10,6 @@ from lms.lms.doctype.lms_quiz.lms_quiz import quiz_summary as lms_quiz_summary_o
 # Set up logging
 logger = logging.getLogger(__name__)
 
-
 @frappe.whitelist()
 def quiz_summary(quiz, results):
 	"""
