@@ -23,7 +23,7 @@ class PCATSubmission(Document):
 				frappe.log_error(f"Corresponding LMS Quiz Submission {lms_submission} has been deleted.")
 
 		except Exception as e:
-			frappe.log_error(f"Error deleting LMS Quiz Submission for PCAT Submission {self.name}: {str(e)}")
+			frappe.log_error(f"Error deleting LMS Quiz Submission for PCAT Submission {self.name}: {e!s}")
 			frappe.msgprint(
 				"Warning: Could not delete corresponding LMS Quiz Submission.", indicator="orange"
 			)

@@ -51,12 +51,12 @@ def quiz_summary(quiz, results):
 				)
 				logger.info(f"Marked LMS submission {original_result['submission']} as PCAT submission")
 			except Exception as e:
-				logger.error(f"Error marking submission as PCAT: {str(e)}")
+				logger.error(f"Error marking submission as PCAT: {e!s}")
 
 		return original_result
 
 	except Exception as e:
-		logger.error(f"Error in quiz_summary for quiz {quiz}: {str(e)}")
+		logger.error(f"Error in quiz_summary for quiz {quiz}: {e!s}")
 		frappe.throw(_("Error processing quiz submission. Please try again."))
 
 
@@ -140,7 +140,7 @@ def pcat_quiz_summary(quiz, results):
 			top_categories.append(("No Category", 0))
 
 		# Add exactly 3 rows to the child table
-		for idx, (category, score) in enumerate(top_categories[:top_count], start=1):
+		for _idx, (category, score) in enumerate(top_categories[:top_count], start=1):
 			submission.append("top_doctop_count_categories", {"riasec_category": category, "score": score})
 
 		# add individual answers
@@ -178,6 +178,6 @@ def pcat_quiz_summary(quiz, results):
 		}
 
 	except Exception as e:
-		logger.error(f"Error in pcat_quiz_summary for quiz {quiz}: {str(e)}")
+		logger.error(f"Error in pcat_quiz_summary for quiz {quiz}: {e!s}")
 		frappe.db.rollback()
 		frappe.throw(_("Error processing PCAT quiz submission. Please try again."))
