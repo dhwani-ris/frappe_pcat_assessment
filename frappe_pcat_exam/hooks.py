@@ -44,7 +44,6 @@ required_apps = ["lms"]
 # include js in doctype views
 doctype_js = {
     "LMS Question": "public/js/pcat_question.js",
-    "LMS Quiz": "public/js/pcat_quiz.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -239,5 +238,18 @@ fixtures = [
         "filters": {
             "name": ["in", ["LMS Quiz-passing_percentage-mandatory"]] 
         },
+    },
+    {
+        "doctype": "Custom Field",
+        "filters": [
+            [
+                "name",
+                "in",
+                [
+                    "LMS Question-custom_pcat_question_category",
+                    "LMS Question-custom_is_pcat_question",
+                ],
+            ]
+        ],
     },
 ]
