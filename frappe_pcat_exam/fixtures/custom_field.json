@@ -96,7 +96,7 @@
   "no_copy": 0,
   "non_negative": 0,
   "options": "PCAT Question Category",
-  "permlevel": 0,
+  "permlevel": 1,
   "placeholder": null,
   "precision": "",
   "print_hide": 0,
